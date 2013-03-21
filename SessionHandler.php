@@ -22,7 +22,17 @@ class SessionHandler{
      */
     protected $dbTable;
 	
-
+    function __construct($dbHost, $dbUser, $dbPassword, $dbDatabase) {
+        // add db data
+        $session->setDbDetails($dbHost, $dbUser, $dbPassword, $dbDatabase);
+        $session->setDbTable('session_handler_table');
+        session_set_save_handler(array($session, 'open'),
+            array($session, 'close'),
+            array($session, 'read'),
+            array($session, 'write'),
+            array($session, 'destroy'),
+            array($session, 'gc'));
+    }
 
 	/**
 	 * Set db data if no connection is being injected
