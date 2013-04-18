@@ -1,11 +1,11 @@
 <?php
 
 /**
-* A PHP session handler to keep session data within a MySQL database
-*
-* @author 	Manuel Reinhard <manu@sprain.ch>
-* @link		https://github.com/sprain/PHP-MySQL-Session-Handler
-*/
+ * A PHP session handler to keep session data within a MySQL database
+ *
+ * @author 	Manuel Reinhard <manu@sprain.ch>
+ * @link		https://github.com/sprain/PHP-MySQL-Session-Handler
+ */
 
 class SessionHandler{
 
@@ -14,75 +14,75 @@ class SessionHandler{
      * @var resource
      */
     protected $dbConnection;
-    
-    
+
+
     /**
      * the name of the DB table which handles the sessions
      * @var string
      */
     protected $dbTable;
-	
+
     function __construct($dbHost, $dbUser, $dbPassword, $dbDatabase) {
         // add db data
-        $session->setDbDetails($dbHost, $dbUser, $dbPassword, $dbDatabase);
-        $session->setDbTable('session_handler_table');
-        session_set_save_handler(array($session, 'open'),
-            array($session, 'close'),
-            array($session, 'read'),
-            array($session, 'write'),
-            array($session, 'destroy'),
-            array($session, 'gc'));
+        $this->setDbDetails($dbHost, $dbUser, $dbPassword, $dbDatabase);
+        $this->setDbTable('session_handler_table');
+        session_set_save_handler(array($this, 'open'),
+                array($this, 'close'),
+                array($this, 'read'),
+                array($this, 'write'),
+                array($this, 'destroy'),
+                array($this, 'gc'));
     }
 
-	/**
-	 * Set db data if no connection is being injected
-	 * @param 	string	$dbHost	
-	 * @param	string	$dbUser
-	 * @param	string	$dbPassword
-	 * @param	string	$dbDatabase
-	 */	
-	public function setDbDetails($dbHost, $dbUser, $dbPassword, $dbDatabase){
+    /**
+     * Set db data if no connection is being injected
+     * @param 	string	$dbHost	
+     * @param	string	$dbUser
+     * @param	string	$dbPassword
+     * @param	string	$dbDatabase
+     */	
+    public function setDbDetails($dbHost, $dbUser, $dbPassword, $dbDatabase){
 
-		//create db connection
-		$this->dbConnection = new mysqli($dbHost, $dbUser, $dbPassword, $dbDatabase);
-		
-		//check connection
-		if (mysqli_connect_error()) {
-		    throw new Exception('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
-		}//if
-			
-	}//function
-	
-	
-	
-	/**
-	 * Inject DB connection from outside
-	 * @param 	object	$dbConnection	expects MySQLi object
-	 */
-	public function setDbConnection($dbConnection){
-	
-		$this->dbConnection = $dbConnection;
-		
-	}
-	
-	
-	/**
-	 * Inject DB connection from outside
-	 * @param 	object	$dbConnection	expects MySQLi object
-	 */
-	public function setDbTable($dbTable){
-	
-		$this->dbTable = $dbTable;
-		
-	}
-	
+        //create db connection
+        $this->dbConnection = new mysqli($dbHost, $dbUser, $dbPassword, $dbDatabase);
+
+        //check connection
+        if (mysqli_connect_error()) {
+            throw new Exception('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+        }//if
+
+    }//function
+
+
+
+    /**
+     * Inject DB connection from outside
+     * @param 	object	$dbConnection	expects MySQLi object
+     */
+    public function setDbConnection($dbConnection){
+
+        $this->dbConnection = $dbConnection;
+
+    }
+
+
+    /**
+     * Inject DB connection from outside
+     * @param 	object	$dbConnection	expects MySQLi object
+     */
+    public function setDbTable($dbTable){
+
+        $this->dbTable = $dbTable;
+
+    }
+
 
     /**
      * Open the session
      * @return bool
      */
     public function open() {
-  
+
         //delete old session handlers
         $limit = time() - (3600 * 24);
         $sql = sprintf("DELETE FROM %s WHERE timestamp < %s", $this->dbTable, $limit);
@@ -119,9 +119,9 @@ class SessionHandler{
             return false;
         }
         return true;
-        
+
     }
-    
+
 
     /**
      * Write the session
@@ -131,10 +131,10 @@ class SessionHandler{
     public function write($id, $data) {
 
         $sql = sprintf("REPLACE INTO %s VALUES('%s', '%s', '%s')",
-        			   $this->dbTable, 
-                       $this->dbConnection->escape_string($id),
-                       $this->dbConnection->escape_string($data),
-                       time());
+                $this->dbTable, 
+                $this->dbConnection->escape_string($id),
+                $this->dbConnection->escape_string($data),
+                time());
         return $this->dbConnection->query($sql);
 
     }
@@ -149,9 +149,9 @@ class SessionHandler{
         $sql = sprintf("DELETE FROM %s WHERE `id` = '%s'", $this->dbTable, $this->dbConnection->escape_string($id));
         return $this->dbConnection->query($sql);
 
-	}
-	
-	
+    }
+
+
 
     /**
      * Garbage Collector
