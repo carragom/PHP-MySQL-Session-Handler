@@ -130,7 +130,8 @@ class SessionHandler{
      */
     public function write($id, $data) {
 
-        $sql = sprintf("REPLACE INTO %s VALUES('%s', '%s', '%s')",
+        //$sql = sprintf("REPLACE INTO %s VALUES('%s', '%s', '%s')",
+        $sql = sprintf("INSERT INTO %s(id, data, timestamp) VALUES('%s', '%s', '%s') ON DUPLICATE KEY UPDATE data=VALUES(data), timestamp=VALUES(timestamp)",
                 $this->dbTable, 
                 $this->dbConnection->escape_string($id),
                 $this->dbConnection->escape_string($data),
@@ -171,3 +172,5 @@ class SessionHandler{
     }
 
 }//class
+
+?>
